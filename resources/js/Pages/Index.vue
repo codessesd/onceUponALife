@@ -126,21 +126,35 @@ for (let i = 0; i < countriesObj.length; i++) {
   countries.push(countriesObj[i].country);
 }
 
-let subtextExpectancy = ref("The Global Life expectancy is");
-let lifeExpectancy = ref(countriesObj[1].allSexes);
+// let subtextExpectancy = ref("The Life expectancy in Life expectancy is");
+// let lifeExpectancy = ref(countriesObj[1].allSexes);
 let selectedCountry = ref(countries[1]);
-watch(
-  () => selectedCountry.value,
-  (newVal) => {
-    if (newVal === countries[0])
-      subtextExpectancy.value = "The Global Life expectancy is";
-    else subtextExpectancy.value = "The Life expectancy in " + newVal + " is";
 
-    lifeExpectancy.value = countriesObj.find(
-      (country) => country.country === newVal
-    ).allSexes;
-  }
+let lifeExpectancy = computed(
+  () =>
+    countriesObj.find((country) => country.country === selectedCountry.value)
+      .allSexes
 );
+
+let subtextExpectancy = computed(() =>
+  selectedCountry.value === countries[0]
+    ? "The Global Life expectancy is"
+    : "The Life expectancy in " + selectedCountry.value + " is"
+);
+// watch(
+//   () => selectedCountry.value,
+//   (newVal) => {
+//     // if (newVal === countries[0])
+//     //     subtextExpectancy.value = "The Global Life expectancy is";
+//     // else
+//     //     subtextExpectancy.value =
+//     //         "The Life expectancy in " + newVal + " is";
+
+//     lifeExpectancy.value = countriesObj.find(
+//       (country) => country.country === newVal
+//     ).allSexes;
+//   }
+// );
 
 let subtextAge = ref("Your age will show here");
 let weeksLived = ref(0);
