@@ -25,7 +25,7 @@
         </div>
         <div class="absolute flex top-0 right-0">
           <Button
-            @click="$emit('toggleInfoModal')"
+            @click="togg"
             class="h-7 w-7 flex justify-center items-center rounded-full p-0 text-center mr-2"
             severity="secondary"
             text
@@ -95,6 +95,10 @@ const Props = defineProps({
     default: 73,
   },
 });
+const emit = defineEmits(["toggleGrid", "toggleInfoModal"]);
+function togg() {
+  emit("toggleInfoModal");
+}
 
 const weeksInYear = ref(52);
 let weekNumber = weeksInYear.value * Props.lifeExpectancy;
