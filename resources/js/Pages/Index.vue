@@ -7,19 +7,15 @@
     </div>
 
     <Transition>
-      <InfoModal
-        v-if="showInfoModal"
-        @close="toggleInfoModal"
-        :heading="headingText"
-        :message="messageText"></InfoModal>
+      <InfoModal v-if="showInfoModal" @close="toggleInfoModal" :heading="headingText" :message="messageText"></InfoModal>
     </Transition>
 
     <div class="m-auto grid justify-items-center px-4 max-w-[800px]">
       <!-- information panel -->
       <div>
         <p class="text-justify">
-          What if you can get a bird's eye view of your life? What if you could see how far you've come and how far you
-          have to go?
+          What if you can get a bird's eye view of your life? What if you could see how far you've come and how far you have to
+          go?
           <Button
             @click="toggleInfoModal(headingStr1, messageStr1)"
             class="inline-block h-7 w-7 justify-center items-center rounded-full p-0 text-center mr-2"
@@ -33,21 +29,25 @@
       <div id="information-panel" class="w-full max-w-[450px] mb-10 mt-10">
         <div class="hidden shadow-lg rounded-lg p-4 mb-10">
           <p class="text-gray-400 text-sm text-justify">
-            When you click Go, a grid will show. Each tiny box represents one week of a person’s life. One row has 52
-            boxes representing one year. For example: If your life expectancy is 100 years then there would be 100 rows
-            with 52 boxes each. If you are 50 years old then 50 rows will be coloured orange, representing the life you
-            have lived.
+            When you click Go, a grid will show. Each tiny box represents one week of a person’s life. One row has 52 boxes
+            representing one year. For example: If your life expectancy is 100 years then there would be 100 rows with 52 boxes
+            each. If you are 50 years old then 50 rows will be coloured orange, representing the life you have lived.
           </p>
         </div>
         <div class="flex-auto w-full">
           <InputGroup label="Enter your Date of Birth" :subtext="subtextAge" :value="yearsLived">
-            <Calendar v-model="dateOfBirth" showIcon inputId="buttondisplay" dateFormat="dd/mm/yy" class="w-full">
-            </Calendar>
+            <Calendar v-model="dateOfBirth" showIcon inputId="buttondisplay" dateFormat="dd/mm/yy" class="w-full"> </Calendar>
           </InputGroup>
 
           <InputGroup label="Life expectancy in" :subtext="subtextExpectancy" :value="lifeExpectancy">
-            <Dropdown v-model="selectedCountry" :options="countries" placeholder="Select a country" class="w-full">
-            </Dropdown>
+            <div class="flex flex-wrap gap-2 w-full text-xs">
+              <Dropdown
+                v-model="selectedCountry"
+                :options="countries"
+                placeholder="Select a country"
+                class="flex-grow min-w-48" />
+              <Dropdown v-model="selectedSex" :options="sexOptions" class="min-w-36" />
+            </div>
           </InputGroup>
           <div class="flex w-full justify-end">
             <Button @click="toggleGrid" class="px-16 mt-10">Go</Button>
@@ -60,7 +60,7 @@
           v-if="showGrid"
           @click.stop="toggleGrid"
           class="fixed top-0 left-0 w-full h-full justify-center items-center bg-black/60 z-10">
-          <div class="flex h-full justify-center items-center py-3">
+          <div class="flex h-full justify-center items-center py-3 px-[2px]">
             <LifeGrid
               v-if="showGrid"
               @toggleGrid="toggleGrid"
@@ -83,8 +83,8 @@
   import InfoModal from "@/MyComponents/InfoModal.vue";
   import {
     LIFE_EXPECTANCY_LABELS,
-    LIFE_EXPECTANCY_BY_LABEL,
-    getAverageByLabel,
+    LIFE_EXPECTANCY_SEX_OPTIONS,
+    getLifeExpectancyByLabelAndSex,
   } from "@/data/lifeExpectancyData.js";
   // import ConfirmDialog from "primevue/confirmdialog";
   // import { useConfirm } from "primevue/useconfirm";
@@ -115,8 +115,10 @@
   const countries = LIFE_EXPECTANCY_LABELS;
   const GLOBAL_LABEL = countries[0]; // assumes first entry is global average
   const selectedCountry = ref(GLOBAL_LABEL);
+  const sexOptions = LIFE_EXPECTANCY_SEX_OPTIONS;
+  const selectedSex = ref(sexOptions[0]);
 
-  const lifeExpectancy = computed(() => getAverageByLabel(selectedCountry.value));
+  const lifeExpectancy = computed(() => getLifeExpectancyByLabelAndSex(selectedCountry.value, selectedSex.value));
 
   const subtextExpectancy = computed(() =>
     selectedCountry.value === GLOBAL_LABEL

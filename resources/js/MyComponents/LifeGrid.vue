@@ -39,7 +39,7 @@
       <div class="flex justify-center px-4">
         <p class="text-sm text-justify max-w-[400px]">
           Each block represents a week of your life. Colored blocks
-          <span class="bg-amber-600 h-[10px] inline-block min-w-[10px] mt-[6px] shadow-sm"></span> show what you’ve
+          <span class="bg-amber-600 rounded-[3px] h-[10px] inline-block min-w-[10px] mt-[6px] shadow-sm"></span> show what you’ve
           lived and blank ones show what could still ahead.
         </p>
       </div>
@@ -47,14 +47,12 @@
 
     <!-- The grid itself -->
     <!-- <div class="flex items-center bg-orange-700"> -->
-    <div id="the-grid" class="mt-5 mb-4 overflow-hidden grow grid grid-cols-[repeat(52,minmax(0,1fr))]">
-      <!-- <div
-        id="watermark-tree"
-        class="absolute left-0 top-0 -z-10 h-full flex justify-center items-center">
+    <div id="the-grid" class="relative mt-5 mb-4 overflow-hidden grow grid grid-cols-[repeat(52,minmax(0,1fr))]">
+      <div id="watermark-tree" class="absolute left-0 top-0 -z-10 h-full flex justify-center items-center">
         <div class="rounded-2xl opacity-20">
           <img src="/images/OnceUponALife_tree_2.png" alt="tree" />
         </div>
-      </div> -->
+      </div>
       <!-- <div class="grid grid-cols-[repeat(52,minmax(0,1fr))]"> -->
       <div
         id="each-box"
@@ -84,10 +82,6 @@
       default: 73,
     },
   });
-  // const emit = defineEmits(["toggleGrid", "toggleInfoModal"]);
-  // function togg() {
-  //   emit("toggleInfoModal");
-  // }
 
   const weeksInYear = ref(52);
   let weekNumber = weeksInYear.value * Props.lifeExpectancy;
@@ -95,43 +89,36 @@
 
 <style scoped>
   .outer-container {
-    /* Variable to be usede for the small boxes */
-    --boxDimensions: 5px;
+    --boxDimensions: 6px;
     --boxMargin-x: 1px;
     --containerMargins: 20px;
-    /* top: 100px;  */
   }
-  .inner-container {
+  /* .inner-container {
     width: calc((var(--boxDimensions) + var(--boxMargin-x) * 2) * 52);
     margin-left: var(--containerMargins);
     margin-right: var(--containerMargins);
     margin-bottom: var(--containerMargins);
-  }
+  } */
 
   .boxes {
     margin-bottom: 1px;
+    border-radius: 2px;
     height: var(--boxDimensions);
     width: var(--boxDimensions);
     margin-left: var(--boxMargin-x);
     margin-right: var(--boxMargin-x);
   }
 
-  /* @media (max-height: 732px) {
-  .outer-container {
-    top: 20px;
+  @media (max-height: 885px) {
+    .outer-container {
+      --boxDimensions: 5px;
+    }
   }
-} */
 
-  @media (max-width: 404px) {
+  @media (max-height: 641px) {
     .outer-container {
       --boxDimensions: 4px;
-      --containerMargins: 10px;
     }
   }
-
-  @media (max-width: 334px) {
-    .outer-container {
-      --boxDimensions: 3px;
-    }
-  }
+  /* Notes: Anything less that height 570px may cut some blocks at the bottom */
 </style>
