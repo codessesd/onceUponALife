@@ -60,9 +60,9 @@
       </div>
       <div class="flex justify-center px-4">
         <p class="text-sm text-justify max-w-[400px]">
-          Each block represents a week of your life. Colored blocks
-          <span class="bg-amber-600 rounded-[3px] h-[10px] inline-block min-w-[10px] mt-[6px] shadow-sm"></span> show what you’ve
-          lived and blank ones show what could still ahead.
+          Each block represents one week of your life. Colored blocks
+          <span class="bg-amber-600 rounded-[3px] h-[10px] inline-block min-w-[10px] mt-[6px] shadow-sm"></span> show what you've
+          lived, and blank ones show what may still lie ahead.
         </p>
       </div>
     </div>
