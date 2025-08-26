@@ -8,7 +8,9 @@
     When making the grid resposinve you must consider the width of the outer container which is made of
     (inner container width) + (outer container padding left and right).
    -->
-  <div class="outer-container w-fit h-full flex flex-col px-2 backdrop-blur-sm shadow-2xl bg-white/80 rounded-lg">
+  <div
+    ref="gridContainer"
+    class="outer-container w-fit h-full flex flex-col px-2 backdrop-blur-sm shadow-2xl bg-white/80 rounded-lg">
     <!-- Header part of the grid -->
     <div class="">
       <div class="relative">
@@ -17,7 +19,27 @@
             <img src="/images/OnceUponALife_text.png" alt="logo" class="w-[150px] max-[334px]:w-[120px]" />
           </div>
         </div>
-        <div class="absolute flex top-0 right-0">
+        <div class="absolute flex top-0 right-0 gap-1">
+          <!-- Export / Share Buttons -->
+          <Button
+            v-if="canShare"
+            @click.stop="sharePng"
+            class="h-7 w-7 flex justify-center items-center rounded-full p-0 text-center"
+            severity="secondary"
+            text
+            raised
+            v-tooltip.top="'Share'">
+            <i class="pi pi-share-alt text-sm"></i>
+          </Button>
+          <Button
+            @click.stop="downloadPng"
+            class="h-7 w-7 flex justify-center items-center rounded-full p-0 text-center"
+            severity="secondary"
+            text
+            raised
+            v-tooltip.top="'Download PNG'">
+            <i class="pi pi-download text-sm"></i>
+          </Button>
           <Button
             @click.stop="$emit('toggleInfoModal', 'What this means?')"
             class="h-7 w-7 flex justify-center items-center rounded-full p-0 text-center mr-2"
@@ -48,6 +70,13 @@
     <!-- The grid itself -->
     <!-- <div class="flex items-center bg-orange-700"> -->
     <div id="the-grid" class="relative mt-5 mb-4 overflow-hidden grow grid grid-cols-[repeat(52,minmax(0,1fr))]">
+      <!-- Export loading overlay -->
+      <div
+        v-if="isExporting"
+        class="export-overlay absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/70 backdrop-blur-sm">
+        <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="4" fill="transparent" animationDuration="1.2s" />
+        <p class="mt-2 text-xs text-gray-600">Rendering image...</p>
+      </div>
       <div id="watermark-tree" class="absolute left-0 top-0 -z-10 h-full flex justify-center items-center">
         <div class="rounded-2xl opacity-20">
           <img src="/images/OnceUponALife_tree_2.png" alt="tree" />
@@ -69,8 +98,11 @@
   </div>
 </template>
 <script setup>
-  import { ref, onUnmounted } from "vue";
+  import { ref, onMounted, nextTick } from "vue";
   import Button from "primevue/button";
+  import { toPng } from "html-to-image";
+  import { useToast } from "primevue/usetoast";
+  import ProgressSpinner from "primevue/progressspinner";
 
   const Props = defineProps({
     weeksLived: {
@@ -85,6 +117,101 @@
 
   const weeksInYear = ref(52);
   let weekNumber = weeksInYear.value * Props.lifeExpectancy;
+
+  // Export logic
+  const gridContainer = ref(null);
+  const canShare = ref(false);
+  const isExporting = ref(false);
+  onMounted(() => {
+    canShare.value = typeof navigator !== "undefined" && !!navigator.share && !!navigator.canShare;
+  });
+
+  const toast = useToast();
+
+  async function generatePngBlob() {
+    if (!gridContainer.value) return null;
+    isExporting.value = true;
+    // Let spinner paint
+  await nextTick();
+  // Two rAFs + a setTimeout(0) fallback to maximize chance of paint before heavy work
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  await new Promise((r) => setTimeout(r, 0));
+    const commonOptions = {
+      cacheBust: true,
+      filter: (node) => {
+        if (node.tagName === "BUTTON") return false;
+        if (node.classList && node.classList.contains("pi-times")) return false;
+        if (node.classList && node.classList.contains("export-overlay")) return false;
+        return true;
+      },
+      backgroundColor: "#FFFFFF",
+    };
+    const attempts = [2, 1];
+    for (const pr of attempts) {
+      try {
+        const dataUrl = await toPng(gridContainer.value, { ...commonOptions, pixelRatio: pr });
+        if (pr === 1) {
+          toast.add({
+            severity: "warn",
+            summary: "Lower quality",
+            detail: "High-res failed; used standard resolution.",
+            life: 3000,
+          });
+        }
+        // Successful render; clear exporting state before returning
+        isExporting.value = false;
+        return dataUrl;
+      } catch (e) {
+        console.warn(`PNG export attempt with pixelRatio=${pr} failed`, e);
+        if (pr === attempts[attempts.length - 1]) {
+          toast.add({
+            severity: "error",
+            summary: "Export failed",
+            detail: "Could not generate image. Try a different browser or reduce size.",
+            life: 4000,
+          });
+        }
+      } finally {
+        await new Promise((r) => requestAnimationFrame(r));
+      }
+    }
+    isExporting.value = false;
+    return null;
+  }
+
+  async function downloadPng() {
+    if (isExporting.value) return;
+    const dataUrl = await generatePngBlob();
+    if (!dataUrl) return;
+    const a = document.createElement("a");
+    a.download = `once-upon-a-life_weeks-lived-${Props.weeksLived}.png`;
+    a.href = dataUrl;
+    a.click();
+    toast.add({ severity: "success", summary: "Downloaded", detail: "Image saved.", life: 2000 });
+  }
+
+  async function sharePng() {
+    if (isExporting.value) return;
+    const dataUrl = await generatePngBlob();
+    if (!dataUrl) return;
+    if (canShare.value) {
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+      const file = new File([blob], "once-upon-a-life.png", { type: "image/png" });
+      try {
+        if (navigator.canShare && !navigator.canShare({ files: [file] })) throw new Error("Cannot share file");
+        await navigator.share({ title: "Once Upon A Life", text: "My life weeks chart", files: [file] });
+        toast.add({ severity: "success", summary: "Shared", detail: "Image sharing initiated.", life: 2000 });
+      } catch (err) {
+        console.warn("Share failed, falling back to download", err);
+        toast.add({ severity: "warn", summary: "Share unavailable", detail: "Falling back to download.", life: 2500 });
+        downloadPng();
+      }
+    } else {
+      toast.add({ severity: "info", summary: "Sharing not supported", detail: "Downloading PNG instead.", life: 2500 });
+      downloadPng();
+    }
+  }
 </script>
 
 <style scoped>

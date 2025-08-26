@@ -81,6 +81,7 @@
   import InputGroup from "@/MyComponents/InputGroup.vue";
   import LifeGrid from "@/MyComponents/LifeGrid.vue";
   import InfoModal from "@/MyComponents/InfoModal.vue";
+  import { differenceInYears, differenceInWeeks, startOfDay } from "date-fns";
   import {
     LIFE_EXPECTANCY_LABELS,
     LIFE_EXPECTANCY_SEX_OPTIONS,
@@ -126,45 +127,25 @@
       : "The life expectancy in " + selectedCountry.value + " is"
   );
 
-  let subtextAge = ref("Your age will show here");
+  // Dynamically show age subtext (kept same initial message semantics)
+  let subtextAge = computed(() => (yearsLived.value > 0 ? `Your age is:` : "Your age will show here"));
   let weeksLived = ref(0);
   let yearsLived = ref(0);
   let dateOfBirth = ref(new Date());
   watch(
     () => dateOfBirth.value,
     (newVal) => {
-      const userDOB = new Date(newVal);
-      const now = new Date(); //("2025-02-29");
-      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()); //So that we can ignore the miliseconds lapsed since midnight.
-      const millisecondsInOneDay = 24 * 60 * 60 * 1000;
-      const daysSinceBirth = (midnight - userDOB) / millisecondsInOneDay;
-      if (daysSinceBirth <= 0) {
+      const dob = startOfDay(new Date(newVal));
+      const today = startOfDay(new Date());
+      if (dob > today) {
         alert("Please enter a past date");
-      } else {
-        weeksLived.value = Math.floor(daysSinceBirth / 7);
-
-        // Years-lived = floor( daysLived / 365.25 ± tiny "balancer" tweak ) to keep anniversary boundaries intuitive.
-        // For full explanation: see README.md section "Age / Years-Lived Calculation Logic".
-
-        const balancer = 1 - 365 / 365.25;
-        const leapYearFunction = (value) => value % 4 === 0;
-        const isLeapYear = leapYearFunction(userDOB.getFullYear());
-        const isYearBeforeLeap = userDOB.getFullYear() % 2 != 0 && leapYearFunction(userDOB.getFullYear() + 1);
-        const isEvenButNotLeap = userDOB.getFullYear() % 2 === 0 && userDOB.getFullYear() % 4 != 0;
-        const yearAfterLeap = userDOB.getFullYear() % 2 != 0 && leapYearFunction(userDOB.getFullYear() - 1); //Not used because it's the last else statement, just hear for clearity.
-
-        if (isLeapYear) {
-          yearsLived.value = Math.floor(daysSinceBirth / 365.25 + balancer);
-        } else if (isYearBeforeLeap) {
-          yearsLived.value = Math.floor(daysSinceBirth / 365.25 - balancer * 2);
-        } else if (isEvenButNotLeap) {
-          yearsLived.value = Math.floor(daysSinceBirth / 365.25 - balancer);
-        } else {
-          //else is it the year after leap year
-          yearsLived.value = Math.floor(daysSinceBirth / 365.25);
-        }
+        return;
       }
-    }
+      // Use date-fns for precise calendar-aware differences.
+      yearsLived.value = differenceInYears(today, dob);
+      weeksLived.value = differenceInWeeks(today, dob);
+    },
+    { immediate: true }
   );
 </script>
 

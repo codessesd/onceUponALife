@@ -13,11 +13,19 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
+        {{-- Fallback for Vite 5+ dev websocket token (avoids "__WS_TOKEN__ is not defined" if inline preamble blocked by CSP or plugin mismatch) --}}
+        @env('local')
+            <script>
+                window.__WS_TOKEN__ = window.__WS_TOKEN__ || '';
+                if (typeof __WS_TOKEN__ === 'undefined') { window.__WS_TOKEN__ = ''; }
+            </script>
+        @endenv
         @routes
         @vite(['resources/js/app.js', "resources/js/Pages/{$page['component']}.vue"])
         @inertiaHead
     </head>
     <body class="font-sans antialiased">
         @inertia
+    <div id="toast-root"><toast /></div>
     </body>
 </html>

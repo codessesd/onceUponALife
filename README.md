@@ -15,7 +15,7 @@ Once Upon A Life will help you visualize and reflect your life.
 
 ---
 
-## Age / Years-Lived Calculation Logic
+<!-- ## Age / Years-Lived Calculation Logic
 
 We estimate full years lived by dividing total days lived by **365.25** (average year length including leap years) and then applying a tiny corrective offset (the "balancer") before `Math.floor()` so exact birthdays map to the expected integer.
 
@@ -64,6 +64,4 @@ Fast, deterministic, visually accurate for this grid. Not a substitute for preci
 ### Possible Future Improvements
 
 - Replace heuristic with date-fns / dayjs precise diff and benchmark.
-- Unit tests for Feb 29 edge cases & leap transitions.
-
-Implementation site: `resources/js/Pages/Index.vue` (see inline comment near years calculation watcher).
+- Unit tests for Feb 29 edge cases & leap transitions. -->
