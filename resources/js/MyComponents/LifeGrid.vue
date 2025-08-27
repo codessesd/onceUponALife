@@ -32,6 +32,7 @@
             <i class="pi pi-share-alt text-sm"></i>
           </Button>
           <Button
+            v-if="canDownload"
             @click.stop="downloadPng"
             class="h-7 w-7 flex justify-center items-center rounded-full p-0 text-center"
             severity="secondary"
@@ -62,7 +63,8 @@
         <p class="text-sm text-justify max-w-[400px]">
           Each block represents one week of your life. Colored blocks
           <span class="bg-amber-600 rounded-[3px] h-[10px] inline-block min-w-[10px] mt-[6px] shadow-sm"></span> show what you've
-          lived, and blank ones show what may still lie ahead.
+          lived, and blank ones show what may still lie ahead with a life expectancy of <b>{{ lifeExpectancy }}</b
+          >.
         </p>
       </div>
     </div>
@@ -89,8 +91,14 @@
         :key="index"
         class="boxes inline-block"
         :class="{
-          ' bg-amber-600 ': index + 1 <= weeksLived,
-          ' border border-gray-600 ': index + 1 > weeksLived,
+          // Distinct colors per life stage (predicates invoked with index)
+          ' bg-green-600 ': babyYears(index), // Early childhood
+          ' bg-amber-500 ': schoolYears(index), // School years
+          ' bg-blue-500 ': universityYears(index), // University
+          ' bg-indigo-500 ': postgraduateYears(index), // Postgraduate
+          ' bg-emerald-600 ': workYears(index), // Working life
+          ' bg-purple-500 ': retirementYears(index), // Retirement
+          ' bg-rose-500 ': oldAgeYears(index), // Old age
         }"></div>
       <!-- </div> -->
     </div>
@@ -98,7 +106,7 @@
   </div>
 </template>
 <script setup>
-  import { ref, onMounted, nextTick } from "vue";
+  import { ref, onMounted, nextTick, computed } from "vue";
   import Button from "primevue/button";
   import { toPng } from "html-to-image";
   import { useToast } from "primevue/usetoast";
@@ -118,9 +126,43 @@
   const weeksInYear = ref(52);
   let weekNumber = weeksInYear.value * Props.lifeExpectancy;
 
+  // Life stage helpers ------------------------------------------------------
+  const weeksPerYear = 52; // Keep magic number in one place
+
+  // Generic range checker (week index is 0-based)
+  function weekInYears(weekIndex, startYearInclusive, endYearExclusive) {
+    return weekIndex >= startYearInclusive * weeksPerYear && weekIndex < endYearExclusive * weeksPerYear;
+  }
+
+  // Stages (adjust as desired). Using functions instead of computed because we
+  // need a predicate that accepts the current week index.
+  const babyYears = (weekIndex) => weekInYears(weekIndex, 0, 5); // 0-4
+  const schoolYears = (weekIndex) => weekInYears(weekIndex, 5, 18); // 5-17
+  const universityYears = (weekIndex) => weekInYears(weekIndex, 18, 22); // 18-21
+  const postgraduateYears = (weekIndex) => weekInYears(weekIndex, 22, 25); // 22-24
+  const workYears = (weekIndex) => weekInYears(weekIndex, 25, 60); // 25-59
+  // const unlivedYears = (weekIndex) => weekInYears(weekIndex, wee, 60);
+
+  // Retirement & old age relative to life expectancy so they adapt dynamically
+  function getRetirementStartYear() {
+    // Use 60 or (lifeExpectancy - 15) whichever is smaller to avoid negative spans
+    return Math.min(60, Math.max(0, Props.lifeExpectancy - 15));
+  }
+  function getOldAgeStartYear() {
+    return Math.max(0, Props.lifeExpectancy - 5);
+  }
+  const retirementYears = (weekIndex) => weekInYears(weekIndex, getRetirementStartYear(), getOldAgeStartYear());
+  const oldAgeYears = (weekIndex) => weekIndex >= getOldAgeStartYear() * weeksPerYear;
+
+  // NOTE: In the template multiple identical class keys ' bg-amber-600 ' exist.
+  // Only the last duplicate key in an object literal is kept by JS, so if you
+  // want distinct colors per stage consider refactoring to a single function
+  // that returns the stage class rather than multiple boolean entries.
+
   // Export logic
   const gridContainer = ref(null);
   const canShare = ref(false);
+  const canDownload = ref(false);
   const isExporting = ref(false);
   onMounted(() => {
     canShare.value = typeof navigator !== "undefined" && !!navigator.share && !!navigator.canShare;
@@ -132,10 +174,10 @@
     if (!gridContainer.value) return null;
     isExporting.value = true;
     // Let spinner paint
-  await nextTick();
-  // Two rAFs + a setTimeout(0) fallback to maximize chance of paint before heavy work
-  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-  await new Promise((r) => setTimeout(r, 0));
+    await nextTick();
+    // Two rAFs + a setTimeout(0) fallback to maximize chance of paint before heavy work
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    await new Promise((r) => setTimeout(r, 0));
     const commonOptions = {
       cacheBust: true,
       filter: (node) => {

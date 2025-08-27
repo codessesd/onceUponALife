@@ -244,7 +244,7 @@
   const messageStr1 =
     "Enter your date of birth and select a life expectancy for any country you like. Click Go to see a chart showing your life as colored blocks within a full lifespan grid.";
   const messageStr2 =
-    "Each tiny box is one week of your life, a small moment in your story. A row of 52 boxes forms a year, a chapter of your journey. If your life expectancy is 100 years, the grid stretches out with 100 rows, each holding 52 weeks. The rows that glow orange are the weeks you've already lived, the moments and experiences that have shaped you. Note: A year is about 52 weeks plus 1 day, so you gain roughly one extra week every 7 years, which the chart accounts for.";
+    "Each tiny box is one week of your life, a small moment in your story. A row of 52 boxes forms a year, a chapter of your journey. If your life expectancy is 100 years, the grid stretches out with 100 rows, each holding 52 weeks. The rows that glow orange are the weeks you've already lived, the moments and experiences that have shaped you.";
 
   function toggleInfoModal(text1, text2) {
     showInfoModal.value = !showInfoModal.value;
