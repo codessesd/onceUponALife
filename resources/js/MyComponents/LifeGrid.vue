@@ -90,16 +90,17 @@
         v-for="(week, index) in weekNumber"
         :key="index"
         class="boxes inline-block"
-        :class="{
+        :class="
           // Distinct colors per life stage (predicates invoked with index)
-          ' bg-green-600 ': babyYears(index), // Early childhood
-          ' bg-amber-500 ': schoolYears(index), // School years
-          ' bg-blue-500 ': universityYears(index), // University
-          ' bg-indigo-500 ': postgraduateYears(index), // Postgraduate
-          ' bg-emerald-600 ': workYears(index), // Working life
-          ' bg-purple-500 ': retirementYears(index), // Retirement
-          ' bg-rose-500 ': oldAgeYears(index), // Old age
-        }"></div>
+          // ' bg-green-600 ': babyYears(index), // Early childhood
+          // ' bg-amber-500 ': schoolYears(index), // School years
+          // ' bg-blue-500 ': universityYears(index), // University
+          // ' bg-indigo-500 ': postgraduateYears(index), // Postgraduate
+          // ' bg-emerald-600 ': workYears(index), // Working life
+          // ' bg-purple-500 ': retirementYears(index), // Retirement
+          // ' bg-rose-500 ': oldAgeYears(index), // Old age
+          determineStyle(index)
+        "></div>
       <!-- </div> -->
     </div>
     <!-- </div> -->
@@ -122,26 +123,66 @@
       default: 73,
     },
   });
+  const determineStyle = (index) => {
+    if (index >= Props.weeksLived) {
+      return "border border-gray-500"; // future weeks
+    }
 
-  const weeksInYear = ref(52);
-  let weekNumber = weeksInYear.value * Props.lifeExpectancy;
+    if (index >= toWeeks(lifeStages.babyYears.min) && index <= toWeeks(lifeStages.babyYears.max)) {
+      return lifeStages.babyYears.style;
+    }
+    if (index >= toWeeks(lifeStages.schoolYears.min) && index <= toWeeks(lifeStages.schoolYears.max)) {
+      return lifeStages.schoolYears.style;
+    }
+    if (index >= toWeeks(lifeStages.universityYears.min) && index <= toWeeks(lifeStages.universityYears.max)) {
+      return lifeStages.universityYears.style;
+    }
+    if (index >= toWeeks(lifeStages.postgraduateYears.min) && index <= toWeeks(lifeStages.postgraduateYears.max)) {
+      return lifeStages.postgraduateYears.style;
+    }
+    if (index >= toWeeks(lifeStages.workYears.min) && index <= toWeeks(lifeStages.workYears.max)) {
+      return lifeStages.workYears.style;
+    }
 
-  // Life stage helpers ------------------------------------------------------
-  const weeksPerYear = 52; // Keep magic number in one place
+    return "bg-gray-300"; // fallback (e.g. beyond workYears)
+  };
+  const weeksInYear = 52;
+  const accurateWeeksInYear = 52;
+  let weekNumber = weeksInYear * Props.lifeExpectancy;
 
+  const toWeeks = (value) => Math.floor(accurateWeeksInYear * value);
   // Generic range checker (week index is 0-based)
-  function weekInYears(weekIndex, startYearInclusive, endYearExclusive) {
-    return weekIndex >= startYearInclusive * weeksPerYear && weekIndex < endYearExclusive * weeksPerYear;
-  }
+  // function weekInYears(weekIndex, startYearInclusive, endYearExclusive) {
+  //   return weekIndex >= startYearInclusive * weeksPerYear && weekIndex < endYearExclusive * weeksPerYear;
+  // }
 
-  // Stages (adjust as desired). Using functions instead of computed because we
-  // need a predicate that accepts the current week index.
-  const babyYears = (weekIndex) => weekInYears(weekIndex, 0, 5); // 0-4
-  const schoolYears = (weekIndex) => weekInYears(weekIndex, 5, 18); // 5-17
-  const universityYears = (weekIndex) => weekInYears(weekIndex, 18, 22); // 18-21
-  const postgraduateYears = (weekIndex) => weekInYears(weekIndex, 22, 25); // 22-24
-  const workYears = (weekIndex) => weekInYears(weekIndex, 25, 60); // 25-59
-  // const unlivedYears = (weekIndex) => weekInYears(weekIndex, wee, 60);
+  const lifeStages = {
+    babyYears: {
+      min: 0,
+      max: 5,
+      style: "bg-green-600",
+    },
+    schoolYears: {
+      min: 6,
+      max: 18,
+      style: "bg-blue-500",
+    },
+    universityYears: {
+      min: 19,
+      max: 22,
+      style: "bg-yellow-500",
+    },
+    postgraduateYears: {
+      min: 23,
+      max: 25,
+      style: "bg-purple-500",
+    },
+    workYears: {
+      min: 26,
+      max: 60,
+      style: "bg-red-500",
+    },
+  };
 
   // Retirement & old age relative to life expectancy so they adapt dynamically
   function getRetirementStartYear() {
@@ -153,11 +194,6 @@
   }
   const retirementYears = (weekIndex) => weekInYears(weekIndex, getRetirementStartYear(), getOldAgeStartYear());
   const oldAgeYears = (weekIndex) => weekIndex >= getOldAgeStartYear() * weeksPerYear;
-
-  // NOTE: In the template multiple identical class keys ' bg-amber-600 ' exist.
-  // Only the last duplicate key in an object literal is kept by JS, so if you
-  // want distinct colors per stage consider refactoring to a single function
-  // that returns the stage class rather than multiple boolean entries.
 
   // Export logic
   const gridContainer = ref(null);
