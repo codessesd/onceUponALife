@@ -61,7 +61,7 @@
       </div>
       <div class="flex justify-center px-4">
         <p class="text-sm text-justify max-w-[400px]">
-          Each block represents one week of your life. Colored blocks
+          Each block represents one week of your life. Coloured blocks
           <span class="bg-amber-600 rounded-[3px] h-[10px] inline-block min-w-[10px] mt-[6px] shadow-sm"></span> show what you've
           lived, and blank ones show what may still lie ahead with a life expectancy of <b>{{ lifeExpectancy }}</b
           >.
@@ -125,7 +125,7 @@
   });
   const determineStyle = (index) => {
     if (index >= Props.weeksLived) {
-      return "border border-gray-500"; // future weeks
+      return "border border-gray-400"; // future weeks
     }
 
     if (index >= toWeeks(lifeStages.babyYears.min) && index <= toWeeks(lifeStages.babyYears.max)) {
@@ -150,7 +150,7 @@
   const accurateWeeksInYear = 52;
   let weekNumber = weeksInYear * Props.lifeExpectancy;
 
-  const toWeeks = (value) => Math.floor(accurateWeeksInYear * value);
+  const toWeeks = (value) => Math.floor(weeksInYear * value);
   // Generic range checker (week index is 0-based)
   // function weekInYears(weekIndex, startYearInclusive, endYearExclusive) {
   //   return weekIndex >= startYearInclusive * weeksPerYear && weekIndex < endYearExclusive * weeksPerYear;
@@ -159,28 +159,33 @@
   const lifeStages = {
     babyYears: {
       min: 0,
-      max: 5,
-      style: "bg-green-600",
+      max: 6,
+      style: "bg-amber-600",
     },
     schoolYears: {
       min: 6,
-      max: 18,
-      style: "bg-blue-500",
+      max: 19,
+      style: "bg-amber-600",
     },
     universityYears: {
       min: 19,
-      max: 22,
-      style: "bg-yellow-500",
+      max: 23,
+      style: "bg-amber-600",
     },
     postgraduateYears: {
       min: 23,
-      max: 25,
-      style: "bg-purple-500",
+      max: 26,
+      style: "bg-amber-600",
     },
     workYears: {
       min: 26,
       max: 60,
-      style: "bg-red-500",
+      style: "bg-amber-600",
+    },
+    oldAgeYears: {
+      min: 60,
+      max: 100,
+      style: "bg-amber-700",
     },
   };
 

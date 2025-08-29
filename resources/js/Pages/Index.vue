@@ -10,7 +10,7 @@
         <InfoModal v-if="showInfoModal" @close="toggleInfoModal" :heading="headingText" :message="messageText"></InfoModal>
       </Transition>
 
-      <section id="calculator-section" class="relative flex justify-center min-h-screen px-3 grain-bg">
+      <section id="calculator-section" class="relative flex justify-center items-center min-h-screen px-3 grain-bg">
         <!-- <div class="border h-screen w-full bg-red-200 rounded-lg"> -->
         <!-- information panel -->
         <!-- <div>
@@ -55,15 +55,16 @@
               </header>
 
               <!-- Progress visual -->
+              <!-- background: 'conic-gradient(red 30%, green 30%, green 70%)', -->
               <div class="mt-6 flex flex-wrap items-center gap-5">
-                <div class="relative h-24 w-24">
+                <div class="relative h-24 w-24 hidden">
                   <div
                     class="absolute inset-0 rounded-full"
                     :style="{
                       background: 'conic-gradient(' + progressColor + ' ' + lifeProgress + '%, #e2e8f0 ' + lifeProgress + '%)',
                     }"></div>
                   <div
-                    class="absolute inset-[6px] rounded-full bg-white/80 backdrop-blur flex flex-col items-center justify-center text-[11px] font-semibold text-slate-700">
+                    class="absolute inset-[6px] rounded-full bg-white 0 backdrop-blur flex flex-col items-center justify-center text-[11px] font-semibold text-slate-700">
                     <span>{{ lifeProgress }}%</span>
                     <span class="mt-[2px] text-[9px] font-normal tracking-wide text-slate-500">lived</span>
                   </div>
@@ -90,7 +91,8 @@
                       :style="{ width: lifeProgress + '%' }"></div>
                   </div>
                   <p class="mt-1 text-[10px] text-slate-500">
-                    A ring + bar summary of your chosen expectancy. Adjust inputs to explore different outlooks.
+                    A bar summary of your chosen expectancy. Adjust inputs to explore different outlooks.
+                    <!-- A ring + bar summary of your chosen expectancy. Adjust inputs to explore different outlooks. -->
                   </p>
                 </div>
               </div>
@@ -126,7 +128,16 @@
                   </div>
                 </InputGroup>
 
-                <div class="flex w-full justify-end">
+                <div class="flex gap-2 w-full justify-end">
+                  <Button
+                    @click="dateOfBirth = new Date()"
+                    class="group relative mt-10 inline-flex items-center gap-2 overflow-hidden rounded-lg bg-slate-800 px-16 py-3 text-sm font-medium text-white shadow hover:bg-slate-800/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
+                    <span
+                      class="absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100 [background:radial-gradient(circle_at_30%_20%,rgba(56,189,248,.5),transparent_60%),radial-gradient(circle_at_80%_70%,rgba(167,139,250,.5),transparent_55%)]"></span>
+                    <i class="pi pi-play text-xs"></i>
+                    Clear
+                  </Button>
+
                   <Button
                     @click="toggleGrid"
                     class="group relative mt-10 inline-flex items-center gap-2 overflow-hidden rounded-lg bg-slate-800 px-16 py-3 text-sm font-medium text-white shadow hover:bg-slate-800/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
@@ -295,15 +306,27 @@
       </section>
     </div>
   </div>
-  <footer class="mt-16 mb-8 text-center text-xs text-gray-500 px-4">
-    Concept inspired by
-    <a
-      href="https://waitbutwhy.com/2014/05/life-weeks.html"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="underline hover:text-gray-700"
-      >Tim Urban's “Your Life in Weeks” (Wait But Why)</a
-    >.
+  <footer class="mt-16 mb-8 text-center text-xs text-gray-500 px-4 space-y-1">
+    <p>
+      Concept inspired by
+      <a
+        href="https://waitbutwhy.com/2014/05/life-weeks.html"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="underline hover:text-gray-700"
+        >Tim Urban's “Your Life in Weeks” (Wait But Why)</a
+      >.
+    </p>
+    <p>
+      Website designed & developed by
+      <a
+        href="https://obscode.co.za"
+        target="_blank"
+        rel="noopener"
+        class="font-medium underline decoration-dotted hover:text-gray-700"
+        >OBSCODE</a
+      >.
+    </p>
   </footer>
 </template>
 <script setup>
@@ -335,7 +358,7 @@
   const headingStr1 = "How does this work?";
   const headingStr2 = "What this means";
   const messageStr1 =
-    "Enter your date of birth and select a life expectancy for any country you like. Click Go to see a chart showing your life as colored blocks within a full lifespan grid.";
+    "Below is form to enter your date of birth and select a life expectancy for any country you like. Click Go to see a chart showing your life as colored blocks within a full lifespan grid.";
   const messageStr2 =
     "Each tiny box is one week of your life, a small moment in your story. A row of 52 boxes forms a year, a chapter of your journey. If your life expectancy is 100 years, the grid stretches out with 100 rows, each holding 52 weeks. The rows that glow orange are the weeks you've already lived, the moments and experiences that have shaped you.";
 

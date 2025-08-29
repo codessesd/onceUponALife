@@ -98,6 +98,27 @@
   }
   .week-box:hover {
     transform: scale(1.35);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.4);
+  }
+
+  @media (max-width: 395px) {
+    .week-box {
+      width: 7px;
+      height: 7px;
+    }
+  }
+  @media (max-width: 365px) {
+    .week-box {
+      width: 6px;
+      height: 6px;
+    }
+  }
+
+  @media (max-width: 335px) {
+    .week-box {
+      width: 5px;
+      height: 5px;
+      border-radius: 1px;
+    }
   }
 </style>
