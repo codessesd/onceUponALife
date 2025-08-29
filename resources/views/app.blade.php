@@ -4,9 +4,15 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- <title inertia>{{ config('app.name', 'Laravel') }}</title> --}}
+    {{-- <title inertia>{{ config('app.name', 'Laravel') }}</title> --}}
 
-        <title>Once Upon A Life</title
+    <title>Once Upon A Life</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <!-- Optional: higher resolution/png variants -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('favicon.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

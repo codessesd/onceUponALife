@@ -130,15 +130,17 @@
 
                 <div class="flex gap-2 w-full justify-end">
                   <Button
+                    severity="secondary"
                     @click="dateOfBirth = new Date()"
                     class="group relative mt-10 inline-flex items-center gap-2 overflow-hidden rounded-lg bg-slate-800 px-16 py-3 text-sm font-medium text-white shadow hover:bg-slate-800/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
                     <span
                       class="absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover:opacity-100 [background:radial-gradient(circle_at_30%_20%,rgba(56,189,248,.5),transparent_60%),radial-gradient(circle_at_80%_70%,rgba(167,139,250,.5),transparent_55%)]"></span>
-                    <i class="pi pi-play text-xs"></i>
+                    <i class="pi pi-trash text-xs"></i>
                     Clear
                   </Button>
 
                   <Button
+                    severity="secondary"
                     @click="toggleGrid"
                     class="group relative mt-10 inline-flex items-center gap-2 overflow-hidden rounded-lg bg-slate-800 px-16 py-3 text-sm font-medium text-white shadow hover:bg-slate-800/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400">
                     <span
